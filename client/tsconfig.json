@@ -1,0 +1,108 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@assets/*": [
+        "src/assets/*"
+      ],
+      "@common/*": [
+        "src/common/*"
+      ],
+      "@data-provider/*": [
+        "src/data-provider/*"
+      ],
+      "@modules/*": [
+        "src/modules/*"
+      ],
+      "@utils/*": [
+        "src/modules/GPTPlus/utils/*"
+      ],
+      "@/*": [
+        "src/*"
+      ],
+      "@assets": [
+        "src/assets"
+      ],
+      "@common": [
+        "src/common"
+      ],
+      "@data-provider": [
+        "src/data-provider"
+      ],
+      "@modules": [
+        "src/modules"
+      ],
+      "@utils": [
+        "src/common/utils"
+      ],
+      "@GPTPlus": [
+        "src/modules/GPTPlus"
+      ],
+      "@Home": [
+        "src/modules/Home"
+      ],
+      "@components": [
+        "src/common/components"
+      ],
+      "@containers": [
+        "src/modules/GPTPlus/containers"
+      ],
+      "@contexts": [
+        "src/common/contexts"
+      ],
+      "@hooks": [
+        "src/modules/GPTPlus/hooks"
+      ],
+      "@": [
+        "src"
+      ],
+      "@logs": [
+        "src/logs"
+      ],
+      "@modulesHomeComponents": [
+        "src/modules/Home/components"
+      ],
+      "@modulesHomeContainers": [
+        "src/modules/Home/containers"
+      ],
+      "@modulesGPTPlusComponents": [
+        "src/modules/GPTPlus/components"
+      ],
+      "@modulesGPTPlusContexts": [
+        "src/modules/GPTPlus/contexts"
+      ],
+      "@modulesGPTPlusUtils": [
+        "src/modules/GPTPlus/utils"
+      ],
+      "@svg": [
+        "src/assets/svg"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}
