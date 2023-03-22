@@ -1,0 +1,35 @@
+
+.chatSection {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  flex: 1;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .chatSection {
+    padding-left: 260px;
+  }
+}
+
+.chatContainer {
+  display: flex;
+  position: relative;
+  align-items: stretch;
+  flex-direction: column;
+  overflow: hidden;
+  color: white;
+  background-color: #343541;
+  flex: 1 1 0%;
+  height: 100%;
+  width: 100%;
+  transition-duration: .15s;
+  transition-property: width;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+
+@media (min-width: 768px) {
+  .chatContainer {
+    padding-top: 0;  }
+}

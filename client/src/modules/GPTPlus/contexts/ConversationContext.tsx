@@ -22,7 +22,7 @@ export type TConversationState = {
 
 const initialState = {
   error: false,
-  title: "ChatGPT Clone",
+  title: "ChatGPT+",
   conversationId: null,
   parentMessageId: null,
   jailbreakConversationId: null,
@@ -118,7 +118,10 @@ const setLatestMessageAction = (payload: any) => ({
   payload,
 });
 
-const reducer = (state: TConversationState, { type, payload }: TConversationAction) => {
+const reducer = (
+  state: TConversationState,
+  { type, payload }: TConversationAction
+) => {
   switch (type) {
     case ConversationActions.refreshConversation:
       return {

@@ -7,13 +7,13 @@ PrimeReact.ripple = true;
 const queryClient = new QueryClient();
 
 //theme
-import "primereact/resources/themes/luna-blue/theme.css";
+// import "primereact/resources/themes/luna-blue/theme.css";
 //core
 import "primereact/resources/primereact.min.css";
 //icons
 import "primeicons/primeicons.css";
 //primeflex
-import "primeflex/primeflex.css";
+// import "primeflex/primeflex.css";
 //custom css
 import "./App.css";
 

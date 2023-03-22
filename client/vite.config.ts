@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
 import { ViteAliases } from "vite-aliases";
 
 // https://vitejs.dev/config/
@@ -98,16 +97,4 @@ export default defineConfig({
     //   },
     // },
   },
-  // resolve: {
-  //   alias: [
-  //     { find: "@src", replacement: path.join(__dirname, "src") },
-  //     { find: "@utils", replacement: path.join(__dirname, "src", "utils") },
-  //     {
-  //       find: "@data-provider",
-  //       replacement: path.join(__dirname, "src", "data-provider"),
-  //     },
-  //     { find: "@common", replacement: path.join(__dirname, "src", "common") },
-  //     { find: "@modules", replacement: path.join(__dirname, "src", "modules") },
-  //   ],
-  // },
 });
