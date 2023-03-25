@@ -6,9 +6,7 @@ export function getOpenAIModels(): Promise<t.TOpenAIModels> {
   return request.get(endpoints.openAiModels());
 }
 
-export function postAICompletion(
-  payload: t.TAICompletionRequest
-) {
+export function postAICompletion(payload: t.TAICompletionRequest) {
   return request.post(endpoints.getAICompletion(), payload);
 }
 
@@ -18,9 +16,27 @@ export function getConversations(
   return request.get(endpoints.getConversations(pageNumber));
 }
 
+export function deleteConversation(payload: t.TDeleteConversationRequest) {
+  //todo: this should be a DELETE request
+  return request.post(endpoints.deleteConversation(), payload);
+}
+
 export function getMessages(id: string): Promise<t.TMessage[]> {
   return request.get(endpoints.getMessages(id));
 }
 
+export function getConversationById(
+  id: string
+): Promise<t.TGetConversationResponse> {
+  return request.get(endpoints.getConversationById(id));
+}
 
+export function updateConversation(
+  payload: t.TUpdateConversationRequest
+): Promise<t.TUpdateConversationResponse> {
+  return request.post(endpoints.updateConversation(), payload);
+}
 
+export function updateCustomGpt(payload: t.TUpdateCustomGptRequest) {
+  return request.post(endpoints.customGpts(), payload);
+}

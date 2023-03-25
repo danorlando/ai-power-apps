@@ -1,7 +1,7 @@
-import React, { useReducer } from "react";
-import { TConversation } from "@data-provider";
+import React, { useState, useReducer } from "react";
+import { TConversation, TMessage } from "@data-provider";
 
-export type TConversationState = {
+type TConversationState = {
   error: boolean;
   title: string;
   conversationId: string | null;
@@ -16,7 +16,7 @@ export type TConversationState = {
   pageNumber: number;
   pages: number;
   refreshConvoHint: number;
-  latestMessage: string | null;
+  latestMessage: TMessage | null;
   convos: TConversation[];
 };
 
@@ -40,7 +40,7 @@ const initialState = {
 };
 
 const ConversationContext = React.createContext<TConversationState | undefined>(
-  undefined
+  initialState
 );
 
 export enum ConversationActions {
@@ -217,12 +217,14 @@ export const ConversationProvider = ({
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const [error, setError] = useState(false);
+
   return (
-    <ConversationDispatchContext.Provider value={dispatch}>
-      <ConversationContext.Provider value={state}>
+    <ConversationContext.Provider value={state}>
+      <ConversationDispatchContext.Provider value={dispatch}>
         {children}
-      </ConversationContext.Provider>
-    </ConversationDispatchContext.Provider>
+      </ConversationDispatchContext.Provider>
+    </ConversationContext.Provider>
   );
 };
 
@@ -231,6 +233,16 @@ export const useConversationState = () => {
   if (context === undefined) {
     throw new Error(
       "useConversationState must be used within a ConversationProvider"
+    );
+  }
+  return context;
+};
+
+export const useConversationDispatch = () => {
+  const context = React.useContext(ConversationDispatchContext);
+  if (context === undefined) {
+    throw new Error(
+      "useConversationDispatch must be used within a ConversationProvider"
     );
   }
   return context;

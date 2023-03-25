@@ -12,9 +12,7 @@ const initialState = {
   messageTree: [],
 };
 
-const MessageContext = React.createContext<TMessageState | undefined>(
-  undefined
-);
+const MessageContext = React.createContext<TMessageState>(initialState);
 
 export enum MessageActions {
   setMessages = "setMessages",
@@ -75,11 +73,11 @@ export const MessageProvider = ({
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <MessageDispatchContext.Provider value={dispatch}>
-      <MessageContext.Provider value={state}>
+    <MessageContext.Provider value={state}>
+      <MessageDispatchContext.Provider value={dispatch}>
         {children}
-      </MessageContext.Provider>
-    </MessageDispatchContext.Provider>
+      </MessageDispatchContext.Provider>
+    </MessageContext.Provider>
   );
 };
 
@@ -89,7 +87,7 @@ export const useMessageState = () => {
     throw new Error("useMessageState must be used within a MessageProvider");
   }
   return context;
-}
+};
 
 export const useSetMessages = () => {
   const dispatch = React.useContext(MessageDispatchContext);
@@ -102,7 +100,7 @@ export const useSetMessages = () => {
     (payload: TMessage[]) => dispatch(setMessagesAction(payload)),
     [dispatch]
   );
-}
+};
 
 export const useSetEmptyMessage = () => {
   const dispatch = React.useContext(MessageDispatchContext);
@@ -112,6 +110,4 @@ export const useSetEmptyMessage = () => {
     );
   }
   return React.useCallback(() => dispatch(setEmptyMessageAction()), [dispatch]);
-}
-
-
+};

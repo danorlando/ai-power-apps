@@ -7,7 +7,7 @@ import {
   PlatformProvider,
   TextProvider,
 } from "./contexts";
-import Layout from "./Layout";
+import Layout from "./layout/Layout";
 
 function GPTPlus() {
   return (

@@ -24,8 +24,16 @@ export const getConversations = (pageNumber: string) => {
   return `${LOCAL_API_BASEURL}/api/convos?pageNumber=${pageNumber}`
 }
 
+export const getConversationById = (id: string) => {
+  return `${LOCAL_API_BASEURL}/api/convos/${id}`
+};
+
 export const updateConversation = () => {
   return `${LOCAL_API_BASEURL}/api/convos/update`
+}
+
+export const deleteConversation = () => {
+  return `${LOCAL_API_BASEURL}/api/convos/clear`
 }
 
 export const prompts = () => {

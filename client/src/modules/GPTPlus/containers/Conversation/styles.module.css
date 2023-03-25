@@ -1,9 +1,0 @@
-.conversationContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  height: 100%;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}

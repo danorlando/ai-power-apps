@@ -9,6 +9,7 @@ export type TCompletionState = {
   promptPrefix: string | null;
   chatGptLabel: string | null;
   customModel: string | null;
+  cursor: boolean;
 };
 
 const initialState = {
@@ -20,11 +21,10 @@ const initialState = {
   promptPrefix: null,
   chatGptLabel: null,
   customModel: null,
+  cursor: true,
 };
 
-const CompletionContext = React.createContext<TCompletionState | undefined>(
-  undefined
-);
+const CompletionContext = React.createContext<TCompletionState>(initialState);
 
 export enum CompletionActions {
   setSubmitting = "setSubmitting",
@@ -34,12 +34,18 @@ export enum CompletionActions {
   setModel = "setModel",
   setCustomGpt = "setCustomGpt",
   setCustomModel = "setCustomModel",
+  toggleCursor = "toggleCursor",
 }
 
 export type TCompletionAction = {
   type: CompletionActions;
   payload?: any;
 };
+
+const toggleCursorAction = (payload?: boolean) => ({
+  type: CompletionActions.toggleCursor,
+  payload,
+});
 
 const setSubmittingAction = (payload: any) => ({
   type: CompletionActions.setSubmitting,
@@ -76,7 +82,10 @@ const setCustomModelAction = (payload: any) => ({
   payload,
 });
 
-const reducer = (state: TCompletionState, { type, payload }: TCompletionAction) => {
+const reducer = (
+  state: TCompletionState,
+  { type, payload }: TCompletionAction
+) => {
   switch (type) {
     case CompletionActions.setSubmitting:
       return {
@@ -122,6 +131,18 @@ const reducer = (state: TCompletionState, { type, payload }: TCompletionAction) 
         ...state,
         setCustomModel: payload,
       };
+    case CompletionActions.toggleCursor:
+      if (payload) {
+        return {
+          ...state,
+          cursor: payload,
+        };
+      } else {
+        return {
+          ...state,
+          cursor: !state.cursor,
+        };
+      }
     default:
       return state;
   }
@@ -129,9 +150,15 @@ const reducer = (state: TCompletionState, { type, payload }: TCompletionAction) 
 
 type TCompletionDispatch = React.Dispatch<TCompletionAction>;
 
-const CompletionDispatchContext = React.createContext<TCompletionDispatch | undefined>(undefined);
+const CompletionDispatchContext = React.createContext<
+  TCompletionDispatch | undefined
+>(undefined);
 
-export const CompletionProvider = ({ children }: { children: React.ReactNode }) => {
+export const CompletionProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
@@ -146,63 +173,113 @@ export const CompletionProvider = ({ children }: { children: React.ReactNode }) 
 export const useCompletionState = () => {
   const context = React.useContext(CompletionContext);
   if (context === undefined) {
-    throw new Error("useCompletionState must be used within a CompletionProvider");
+    throw new Error(
+      "useCompletionState must be used within a CompletionProvider"
+    );
   }
   return context;
-}
+};
 
 export const useSetSubmitting = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetSubmitting" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetSubmitting" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setSubmittingAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setSubmittingAction(payload)),
+    [dispatch]
+  );
+};
 
 export const useSetSubmission = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetSubmission" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetSubmission" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setSubmissionAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setSubmissionAction(payload)),
+    [dispatch]
+  );
+};
 
 export const useSetStopStream = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetStopStream" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetStopStream" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setStopStreamAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setStopStreamAction(payload)),
+    [dispatch]
+  );
+};
 
 export const useSetDisabled = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetDisabled" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetDisabled" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setDisabledAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setDisabledAction(payload)),
+    [dispatch]
+  );
+};
 
-export const useSetModel = () => {
+export const useSetPlatform = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetModel" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetPlatform" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setModelAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setModelAction(payload)),
+    [dispatch]
+  );
+};
 
 export const useSetCustomGpt = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetCustomGpt" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetCustomGpt" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setCustomGpTCompletionAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setCustomGpTCompletionAction(payload)),
+    [dispatch]
+  );
+};
 
 export const useSetCustomModel = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
-    throw new Error('"useSetCustomModel" must be used inside CompletionContextProvider');
+    throw new Error(
+      '"useSetCustomModel" must be used inside CompletionContextProvider'
+    );
   }
-  return React.useCallback((payload: any) => dispatch(setCustomModelAction(payload)), [dispatch]);
-}
+  return React.useCallback(
+    (payload: any) => dispatch(setCustomModelAction(payload)),
+    [dispatch]
+  );
+};
+
+export const useToggleCursor = () => {
+  const dispatch = React.useContext(CompletionDispatchContext);
+  if (dispatch === undefined) {
+    throw new Error(
+      '"useToggleCursor" must be used inside CompletionContextProvider'
+    );
+  }
+  return React.useCallback(
+    (payload?: boolean) => dispatch(toggleCursorAction(payload)),
+    [dispatch]
+  );
+};

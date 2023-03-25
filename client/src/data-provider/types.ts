@@ -1,5 +1,5 @@
 export type TMessage = {
-  messageId: string;
+  messageId?: string;
   conversationId: string;
   conversationSignature: string | null;
   clientId: string;
@@ -11,7 +11,13 @@ export type TMessage = {
   error: boolean;
   createdAt: string;
   updatedAt: string;
-}
+  searchResult: string[];
+  submitting: boolean;
+  children? : any[] | undefined;
+  bgColor?: string;
+  model?: string;
+  cancelled?: boolean;
+};
 
 export type TConversation = {
   conversationId: string;
@@ -29,7 +35,7 @@ export type TConversation = {
   messages: TMessage[];
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type TPrompt = {
   title: string;
@@ -37,7 +43,7 @@ export type TPrompt = {
   category: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type TCustomPrompt = {
   chatGptLabel: string;
@@ -46,26 +52,35 @@ export type TCustomPrompt = {
   createdAt: string;
   updatedAt: string;
   _id: string;
-}
+};
 
 export type TPlatform = {
   _id: string;
   name: string;
   value: string;
   model: string;
-}
+};
 
-export type TUser = {
-
-}
+export type TUser = {};
 
 export type TGetConversationsResponse = {
   conversations: TConversation[];
   pageNumber: string;
   pageSize: string | number;
   pages: string | number;
+};
+
+export type TGetConversationResponse = {
+  data: TConversation;
 }
 
+export type TGetMessagesResponse = {
+  data: TMessage[];
+}
+
+export type TDeleteConversationRequest = {
+  conversationId: string;
+};
 
 export type TAICompletionRequest = {
   chatGptLabel?: string;
@@ -79,13 +94,13 @@ export type TAICompletionRequest = {
   promptPrefix?: string;
   sender: string;
   text: string;
-}
+};
 
 export type TGetPlatformsResponse = {
   hasOpenAI: boolean;
   hasChatGpt: boolean;
   hasBing: boolean;
-}
+};
 
 export type TOpenAIModel = {
   object: string;
@@ -100,15 +115,20 @@ export type TOpenAIModels = {
   models: {
     object: string;
     data: TOpenAIModel[];
-  }
+  };
 };
 
 export type TConversationUpdate = {
   conversationId: string;
   title?: string;
-
-}
+};
 export type TUpdateConversationRequest = {
   arg: {};
-  withCredentials: boolean;
-}
+  withCredentials?: boolean;
+};
+
+export type TUpdateConversationResponse = {
+  data: TConversation;
+};
+
+export type TUpdateCustomGptRequest
