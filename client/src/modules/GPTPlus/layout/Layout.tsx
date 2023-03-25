@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar, MobileNav } from "./Nav";
-import { useConversationState, useProfileState } from "../contexts";
+import { useConversationState, useProfileState, useMessageState } from "../contexts";
 import styles from "./styles.module.css";
-import ChatMessage from '@modules/GPTPlus/components/Chat/ChatMessage';
-import ChatInput from "@modules/GPTPlus/components/Chat/ChatInput";
+import ChatContainer from '@modules/GPTPlus/components/Chat/ChatContainer';
+import PromptInput from "@modules/GPTPlus/components/Chat/PromptInput";
 
 function Layout() {
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const { user } = useProfileState();
-
+  const { title } = useConversationState();
   // todo: add call to get user from user service
+  
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
-  //todo: add mobile nav
+  const { messages, messageTree } = useMessageState();
+  
   return (
     <div className="flex h-screen">
       <Sidebar visible={sidebarVisible} setSidebarVisible={setSidebarVisible} />
@@ -21,8 +26,8 @@ function Layout() {
             visible={sidebarVisible}
             setSidebarVisible={setSidebarVisible}
           />
-          <ChatMessage messages={messages} messageTree={messageTree}/>
-          <ChatInput />
+          <ChatContainer messages={messages} messageTree={messageTree}/>
+          <PromptInput messages={messages}/>
         </div>
       </section>
     </div>

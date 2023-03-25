@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-var SSE = function (url, options) {
+export var SSE = function (url, options) {
   if (!(this instanceof SSE)) {
     return new SSE(url, options);
   }

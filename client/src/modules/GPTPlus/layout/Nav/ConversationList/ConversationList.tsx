@@ -1,5 +1,5 @@
-import Conversation from './Conversation';
-import { TConversation } from '@data-provider';
+import Conversation from "./Conversation";
+import { TConversation } from "@data-provider";
 
 type TConversationListProps = {
   conversations: TConversation[];
@@ -7,9 +7,11 @@ type TConversationListProps = {
   moveToTop: () => void;
 };
 
-
-export default function ConversationList({ conversations, conversationId, moveToTop }: TConversationListProps) {
-
+export default function ConversationList({
+  conversations,
+  conversationId,
+  moveToTop,
+}: TConversationListProps) {
   return (
     <>
       {conversations &&
@@ -21,7 +23,7 @@ export default function ConversationList({ conversations, conversationId, moveTo
                 conversationSignature: convo.conversationSignature,
                 parentMessageId: convo.parentMessageId || null,
                 clientId: convo.clientId,
-                invocationId: convo.invocationId
+                invocationId: convo.invocationId,
               }
             : null;
 
@@ -29,7 +31,7 @@ export default function ConversationList({ conversations, conversationId, moveTo
             <Conversation
               key={convo.conversationId}
               id={convo.conversationId}
-              platform={convo.model}
+              model={convo.model}
               parentMessageId={convo.parentMessageId}
               title={convo.title}
               conversationId={conversationId}

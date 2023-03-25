@@ -13,7 +13,7 @@ export type TMessage = {
   updatedAt: string;
   searchResult: string[];
   submitting: boolean;
-  children? : any[] | undefined;
+  children?: any[] | undefined;
   bgColor?: string;
   model?: string;
   cancelled?: boolean;
@@ -54,11 +54,13 @@ export type TCustomPrompt = {
   _id: string;
 };
 
-export type TPlatform = {
+export type TModel = {
   _id: string;
   name: string;
   value: string;
   model: string;
+  chatGptLabel?: string;
+  promptPrefix?: string;
 };
 
 export type TUser = {};
@@ -72,11 +74,11 @@ export type TGetConversationsResponse = {
 
 export type TGetConversationResponse = {
   data: TConversation;
-}
+};
 
 export type TGetMessagesResponse = {
   data: TMessage[];
-}
+};
 
 export type TDeleteConversationRequest = {
   conversationId: string;
@@ -96,7 +98,7 @@ export type TAICompletionRequest = {
   text: string;
 };
 
-export type TGetPlatformsResponse = {
+export type TGetModelsResponse = {
   hasOpenAI: boolean;
   hasChatGpt: boolean;
   hasBing: boolean;
@@ -131,4 +133,17 @@ export type TUpdateConversationResponse = {
   data: TConversation;
 };
 
-export type TUpdateCustomGptRequest
+export type TUpdateCustomGptRequest = {
+  value: string;
+  chatGptLabel: string;
+  promptPrefix?: string;
+  prevLabel?: string;
+};
+
+export type TUpdateCustomGptResponse = {};
+
+export type TDeleteCustomGptRequest = {
+  id: string;
+}
+
+export type TDeleteCustomGptResponse = {};

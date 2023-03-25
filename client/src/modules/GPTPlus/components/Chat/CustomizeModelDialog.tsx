@@ -2,11 +2,10 @@ import { useState, useRef } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import {
   useSetSubmission,
-  useSetPlatform,
+  useSetModel,
   useSetCustomGpt,
   useSetNewConversation,
-  usePlatformState,
-
+  useModelState,
 } from "@modules/GPTPlus/contexts";
 import {
   Button,
@@ -19,40 +18,45 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@common/components";
+import { useUpdateCustomGptMutation} from '@data-provider';
 
 type TModelDialogProps = {
-  mutate: () => void;
   setModelSave: (value: boolean) => void;
   handleSaveState: (value: string) => void;
 }
 
-export default function ModelDialog({ mutate, setModelSave, handleSaveState }:TModelDialogProps) {
+export default function ModelDialog({ setModelSave, handleSaveState }:TModelDialogProps) {
 
-  const { modelMap, initial } = usePlatformState();
+  const { modelMap, initial } = useModelState();
   const [chatGptLabel, setChatGptLabel] = useState("");
   const [promptPrefix, setPromptPrefix] = useState("");
   const [saveText, setSaveText] = useState("Save");
   const [required, setRequired] = useState(false);
   const inputRef = useRef(null);
-  
-  const updateCustomGpt = manualSWR(`/api/customGpts/`, "post");
 
-  const selectHandler = (e) => {
+  const setSubmission = useSetSubmission();
+  const setModel = useSetModel();
+  const setCustomGpt = useSetCustomGpt();
+  const setNewConvo = useSetNewConversation();
+
+  const updateCustomGpt = useUpdateCustomGptMutation();
+
+  const onCustomPromptSelect = (e: React.MouseEvent) => {
     if (chatGptLabel.length === 0) {
       e.preventDefault();
       setRequired(true);
       inputRef.current.focus();
       return;
     }
-    dispatch(setCustomGpt({ chatGptLabel, promptPrefix }));
-    dispatch(setModel("chatgptCustom"));
+    setCustomGpt({ chatGptLabel, promptPrefix });
+    setModel("chatgptCustom");
     handleSaveState(chatGptLabel.toLowerCase());
     // Set new conversation
-    dispatch(setNewConvo());
-    dispatch(setSubmission({}));
+    setNewConvo();
+    setSubmission({});
   };
 
-  const saveHandler = (e) => {
+  const onSaveCustomPrompt = (e: React.MouseEvent) => {
     e.preventDefault();
     setModelSave(true);
     const value = chatGptLabel.toLowerCase();
@@ -63,23 +67,23 @@ export default function ModelDialog({ mutate, setModelSave, handleSaveState }:TM
       return;
     }
 
-    updateCustomGpt.trigger({ value, chatGptLabel, promptPrefix });
+    updateCustomGpt.mutate({ value, chatGptLabel, promptPrefix });
 
-    mutate();
     setSaveText((prev) => prev + "d!");
     setTimeout(() => {
       setSaveText("Save");
     }, 2500);
 
-    dispatch(setCustomGpt({ chatGptLabel, promptPrefix }));
-    dispatch(setModel("chatgptCustom"));
+    setCustomGpt({ chatGptLabel, promptPrefix });
+    setModel("chatgptCustom");
     // dispatch(setDisabled(false));
   };
-
+  const label = chatGptLabel.toLowerCase();
   if (
     chatGptLabel !== "chatgptCustom" &&
-    modelMap[chatGptLabel.toLowerCase()] &&
-    !initial[chatGptLabel.toLowerCase()] &&
+    modelMap[label] &&
+    // @ts-ignore
+    !initial[label] &&
     saveText === "Save"
   ) {
     setSaveText("Update");
@@ -99,7 +103,7 @@ export default function ModelDialog({ mutate, setModelSave, handleSaveState }:TM
           Note: important instructions are often better placed in your message
           rather than the prefix.{" "}
           <a
-            href="https://platform.openai.com/docs/guides/chat/instructing-chat-models"
+            href="https://model.openai.com/docs/guides/chat/instructing-chat-models"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -142,13 +146,13 @@ export default function ModelDialog({ mutate, setModelSave, handleSaveState }:TM
         </DialogClose>
         <Button
           style={{ backgroundColor: "rgb(16, 163, 127)" }}
-          onClick={saveHandler}
+          onClick={onSaveCustomPrompt}
           className="inline-flex h-10 items-center justify-center rounded-md border-none py-2 px-4 text-sm font-semibold text-white transition-colors dark:text-gray-200"
         >
           {saveText}
         </Button>
         <DialogClose
-          onClick={selectHandler}
+          onClick={onCustomPromptSelect}
           className="inline-flex h-10 items-center justify-center rounded-md border-none bg-gray-900 py-2 px-4 text-sm font-semibold text-white transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 dark:focus:ring-gray-400 dark:focus:ring-offset-gray-900"
         >
           Select

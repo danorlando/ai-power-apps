@@ -14,8 +14,9 @@ export enum QueryKeys {
   getConversations = "getConversations",
   getConversationById = "getConversationById",
   getOpenAIModels = "getOpenAIModels",
-  getPlatforms = "getPlatforms",
+  getModels = "getModels",
   updateCustomGpt = "updateCustomGpt",
+  getCustomGpts = "getCustomGpts",
 }
 
 export const useGetMessagesByConvoId = (
@@ -46,11 +47,44 @@ export const useUpdateConvoMutation = (
   );
 };
 
-export const useUpdateCustomGptMutation = (): UseMutationResult<t.UpdateCustomGptResponse, unknown, t.UpdateCustomGptRequest, unknown> => {
+export const useUpdateCustomGptMutation = (): UseMutationResult<
+  t.TUpdateCustomGptResponse,
+  unknown,
+  t.TUpdateCustomGptRequest,
+  unknown
+> => {
   const queryClient = useQueryClient();
-  return useMutation((payload: t.UpdateCustomGptRequest) => dataService.updateCustomGpt(payload), {
-    onSuccess: () => {
-      queryClient.invalidateQueries(QueryKeys.getPlatforms);
-    },
-  });
+  return useMutation(
+    (payload: t.TUpdateCustomGptRequest) =>
+      dataService.updateCustomGpt(payload),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([QueryKeys.getCustomGpts]);
+      },
+    }
+  );
+};
+
+export const useGetCustomGptsQuery = (): QueryObserverResult<
+  t.TCustomPrompt[],
+  unknown
+> => {
+  return useQuery([QueryKeys.getCustomGpts], () => dataService.getCustomGpts());
+};
+
+export const useDeleteCustomGptMutation = (): UseMutationResult<t.TDeleteCustomGptResponse, unknown, t.TDeleteCustomGptRequest, unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    (payload: t.TDeleteCustomGptRequest) =>
+      dataService.deleteCustomGpt(payload),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([QueryKeys.getCustomGpts]);
+      },
+    }
+  );
+}
+
+export const useGetModelsQuery = (): QueryObserverResult<t.TGetModelsResponse, unknown> => {
+  return useQuery([QueryKeys.getModels], () => dataService.getModels());
 }

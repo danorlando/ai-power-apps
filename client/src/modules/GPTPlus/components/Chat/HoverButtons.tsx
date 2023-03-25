@@ -4,11 +4,15 @@ import { EditIcon } from "@common/icons";
 export type THoverButtonsProps = {
   visible: boolean;
   onClick: () => void;
-  platform: string;
+  model: string;
 };
 
-export default function HoverButtons({ visible, onClick, platform }: THoverButtonsProps) {
-  const isBing = platform === "bingai" || platform === "sydney";
+export default function HoverButtons({
+  visible,
+  onClick,
+  model,
+}: THoverButtonsProps) {
+  const isBing = model === "bingai" || model === "sydney";
   const enabled = !isBing;
 
   return (

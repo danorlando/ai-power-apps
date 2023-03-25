@@ -2,7 +2,7 @@ import { useCompletionState, useConversationState } from "@modules/GPTPlus/conte
 
 type TSubmitButtonProps = {
   submitMessage: () => void;
-  disabled: boolean;
+  disabled: boolean | undefined;
 };
 
 export default function SubmitButton({ submitMessage, disabled }: TSubmitButtonProps) {

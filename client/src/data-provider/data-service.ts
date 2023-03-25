@@ -40,3 +40,15 @@ export function updateConversation(
 export function updateCustomGpt(payload: t.TUpdateCustomGptRequest) {
   return request.post(endpoints.customGpts(), payload);
 }
+
+export function getCustomGpts(): Promise<t.TGetCustomGptsResponse> {
+  return request.get(endpoints.customGpts());
+}
+
+export function deleteCustomGpt(payload: t.TDeleteCustomGptRequest): Promise<t.TDeleteCustomGptResponse> {
+  return request.post(endpoints.deleteCustomGpt(), payload);
+}
+
+export function getModels(): Promise<t.TCustomPrompt[]> {
+  return request.get(endpoints.getModels());
+}

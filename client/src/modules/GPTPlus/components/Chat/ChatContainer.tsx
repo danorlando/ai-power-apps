@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import {Spinner} from "@common/icons";
+import { Spinner } from "@common/icons";
 import { throttle } from "lodash";
 import { CSSTransition } from "react-transition-group";
 import ScrollButton from "./ScrollButton";
@@ -7,7 +7,7 @@ import ChatMulti from "./ChatMulti";
 import {
   useConversationState,
   useCompletionState,
-  usePlatformState,
+  useModelState,
 } from "@modules/GPTPlus/contexts";
 
 export type TChatContainerProps = {
@@ -19,7 +19,7 @@ function ChatContainer({ messages, messageTree }: TChatContainerProps) {
   const [currentEditId, setCurrentEditId] = useState<string | number>(-1);
   const { conversationId } = useConversationState();
   const { model, customModel } = useCompletionState();
-  const { models } = usePlatformState();
+  const { models } = useModelState();
   const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
   const scrollableRef = useRef(null);
   const messagesEndRef = useRef(null);

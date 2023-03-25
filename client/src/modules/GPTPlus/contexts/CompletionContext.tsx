@@ -232,11 +232,11 @@ export const useSetDisabled = () => {
   );
 };
 
-export const useSetPlatform = () => {
+export const useSetModel = () => {
   const dispatch = React.useContext(CompletionDispatchContext);
   if (dispatch === undefined) {
     throw new Error(
-      '"useSetPlatform" must be used inside CompletionContextProvider'
+      '"useSetModel" must be used inside CompletionContextProvider'
     );
   }
   return React.useCallback(

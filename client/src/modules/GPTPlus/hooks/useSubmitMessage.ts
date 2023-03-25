@@ -1,5 +1,5 @@
 // @ts-ignore
-import { SSE } from "../utils/sse";
+import { SSE } from "../utils/sse.js";
 import resetConversation from "../utils/resetConversation";
 import {
   useSetNewConversation,
@@ -10,7 +10,7 @@ import {
   useSetSubmitting,
   useSetText,
   useSetSubmission,
-  usePlatformState,
+  useModelState,
   useCompletionState,
   useTextState,
 } from "@modules/GPTPlus/contexts";
@@ -23,7 +23,7 @@ export type TCreateCompletionProps = {
 
 export const useSubmitMesssage = () => {
   const conversation = useConversationState();
-  const { initial } = usePlatformState();
+  const { initial } = useModelState();
   const { messages } = useMessageState();
   const { model, chatGptLabel, promptPrefix, isSubmitting } =
     useCompletionState();
@@ -37,16 +37,19 @@ export const useSubmitMesssage = () => {
   const setSubmitting = useSetSubmitting();
   const setSubmission = useSetSubmission();
 
+  type TcreateCompletionProps = {
+    text: string;
+    parentMessageId?: string;
+    conversationId?: string;
+    messageId?: string;
+  };
   const createCompletion = (
     {
       text,
       parentMessageId,
       conversationId,
       messageId,
-    }: Pick<
-      TMessage,
-      "text" | "parentMessageId" | "conversationId" | "messageId"
-    >,
+    }: TcreateCompletionProps,
     { shouldRegenerate = false }: { shouldRegenerate?: boolean } = {}
   ) => {
     if (error) {

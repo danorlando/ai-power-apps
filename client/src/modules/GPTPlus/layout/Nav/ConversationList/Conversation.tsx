@@ -1,26 +1,29 @@
 import { useState, useRef } from "react";
-import RenameButton from "./RenameButton";
-import DeleteButton from "./DeleteButton";
+import RenameButton from "../../../components/common/RenameButton";
+import DeleteButton from "../../../components/common/DeleteButton";
 import { ConvoIcon } from "@common/icons";
 import {
   useSetConversation,
   useSetSubmission,
   useSetStopStream,
   useSetCustomGpt,
-  useSetPlatform,
+  useSetModel,
   useSetCustomModel,
   useSetMessages,
   useSetEmptyMessage,
   useSetText,
   useRefreshConversation,
-  usePlatformState,
-  useCompletionState
+  useModelState,
+  useCompletionState,
 } from "@modules/GPTPlus/contexts";
-import { useUpdateConvoMutation, useGetMessagesByConvoId } from "@data-provider";
+import {
+  useUpdateConvoMutation,
+  useGetMessagesByConvoId,
+} from "@data-provider";
 
 type TConversationProps = {
   id: string;
-  platform: string;
+  model: string;
   parentMessageId: string;
   conversationId: string;
   title: string;
@@ -31,7 +34,7 @@ type TConversationProps = {
 };
 export default function Conversation({
   id,
-  platform,
+  model,
   parentMessageId,
   conversationId,
   title,
@@ -40,18 +43,17 @@ export default function Conversation({
   bingData,
   retainView,
 }: TConversationProps) {
-
   const setConversation = useSetConversation();
   const setSubmission = useSetSubmission();
   const setStopStream = useSetStopStream();
   const setCustomGpt = useSetCustomGpt();
-  const setPlatform = useSetPlatform();
+  const setModel = useSetModel();
   const setCustomModel = useSetCustomModel();
   const setMessages = useSetMessages();
   const setEmptyMessage = useSetEmptyMessage();
   const setText = useSetText();
   const refreshConversation = useRefreshConversation();
-  const { modelMap } = usePlatformState();
+  const { modelMap } = useModelState();
   const { stopStream } = useCompletionState();
 
   const [renaming, setRenaming] = useState(false);
@@ -88,37 +90,37 @@ export default function Conversation({
         clientId,
         invocationId,
       } = bingData;
-        setConversation({
-          ...conversation,
-          parentMessageId,
-          jailbreakConversationId,
-          conversationSignature,
-          clientId,
-          invocationId,
-          latestMessage: null,
-        })
+      setConversation({
+        ...conversation,
+        parentMessageId,
+        jailbreakConversationId,
+        conversationSignature,
+        clientId,
+        invocationId,
+        latestMessage: null,
+      });
     } else {
-        setConversation({
-          ...conversation,
-          parentMessageId,
-          jailbreakConversationId: null,
-          conversationSignature: null,
-          clientId: null,
-          invocationId: null,
-          latestMessage: null,
-        })
+      setConversation({
+        ...conversation,
+        parentMessageId,
+        jailbreakConversationId: null,
+        conversationSignature: null,
+        clientId: null,
+        invocationId: null,
+        latestMessage: null,
+      });
     }
 
     if (chatGptLabel) {
-      setPlatform("chatgptCustom");
+      setModel("chatgptCustom");
       setCustomModel(chatGptLabel.toLowerCase());
     } else {
-      setPlatform(platform);
+      setModel(model);
       setCustomModel(null);
     }
 
     // if (modelMap[chatGptLabel.toLowerCase()]) {
-    //   console.log('custom platform', chatGptLabel);
+    //   console.log('custom model', chatGptLabel);
     //   dispatch(setCustomModel(chatGptLabel.toLowerCase()));
     // } else {
     //   dispatch(setCustomModel(null));
@@ -150,7 +152,7 @@ export default function Conversation({
       return;
     }
     //note: check if refreshConversation is needed because mutation will refetch queries on success
-    updateConvoMutation.mutate({ arg: {title: titleInput} });
+    updateConvoMutation.mutate({ arg: { title: titleInput } });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

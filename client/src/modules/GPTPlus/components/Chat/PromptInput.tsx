@@ -1,42 +1,47 @@
-import { useEffect, useRef, useState } from 'react';
-import SSE from '@modules/GPTPlus/utils';
-import SubmitButton from './SubmitButton';
+import { useEffect, useRef, useState } from "react";
+// @ts-ignore
+import { SSE } from "../../utils/sse.js";
+import SubmitButton from "../common/SubmitButton";
 // import RegenerateButton from './RegenerateButton';
-// import ModelMenu from '../Models/ModelMenu';
-import Footer from '@modules/GPTPlus/layout/Footer';
-import { InputTextarea } from 'primereact/inputtextarea';
-import createPayload from '@modules/GPTPlus/utils';
+import ModelSelector from './ModelMenu';
+import { InputTextarea } from "primereact/inputtextarea";
+import createPayload from "@modules/GPTPlus/utils";
 // import resetConvo from '~/utils/resetConvo';
-import { RegenerateIcon, StopGeneratingIcon } from '@common/icons';
+import { RegenerateIcon, StopGeneratingIcon } from "@common/icons";
 import {
   useSetConversation,
-  useSetNewConversation,
   useSetError,
-  useRefreshConversation, 
-  useSetMessages, 
+  useRefreshConversation,
+  useSetMessages,
   useSetSubmitting,
   useToggleCursor,
   useSetText,
   useConversationState,
   useProfileState,
-  usePlatformState,
+  useModelState,
   useCompletionState,
   useTextState,
-} from '@modules/GPTPlus/contexts';
-import { useSubmitMesssage } from '@modules/GPTPlus/hooks';
+} from "@modules/GPTPlus/contexts";
+import { useSubmitMesssage } from "@modules/GPTPlus/hooks";
 
-export default function TextChat({ messages }: { messages: any[] }) {
-  const [errorMessage, setErrorMessage] = useState('');
+export default function PromptInput({ messages }: { messages: any[] }) {
+  const [errorMessage, setErrorMessage] = useState("");
   const inputRef = useRef(null);
   const isComposing = useRef(false);
   const { user } = useProfileState();
   const convo = useConversationState();
-  const { initial } = usePlatformState();
-  const { isSubmitting, stopStream, submission, disabled, model, chatGptLabel, promptPrefix } =
-    useCompletionState();
+  const { initial } = useModelState();
+  const {
+    isSubmitting,
+    stopStream,
+    submission,
+    disabled,
+    model,
+    chatGptLabel,
+    promptPrefix,
+  } = useCompletionState();
   const { text } = useTextState();
   const setConversation = useSetConversation();
-  const setNewConversation = useSetNewConversation();
   const setError = useSetError();
   const refreshConversation = useRefreshConversation();
   const setMessages = useSetMessages();
@@ -55,85 +60,94 @@ export default function TextChat({ messages }: { messages: any[] }) {
     inputRef.current?.focus();
   }, [convo?.conversationId]);
 
-  
   const messageHandler = (data: any, currentState: any, currentMsg: any) => {
-    const { messages, _currentMsg, message, sender, isRegenerate } = currentState;
+    const { messages, _currentMsg, message, sender, isRegenerate } =
+      currentState;
 
     if (isRegenerate)
-        setMessages([
-          ...messages,
-          {
-            sender,
-            text: data,
-            parentMessageId: message?.overrideParentMessageId,
-            messageId: message?.overrideParentMessageId + '_',
-            submitting: true
-          }
-        ])
+      setMessages([
+        ...messages,
+        {
+          sender,
+          text: data,
+          parentMessageId: message?.overrideParentMessageId,
+          messageId: message?.overrideParentMessageId + "_",
+          submitting: true,
+        },
+      ]);
     else
-        setMessages([
-          ...messages,
-          currentMsg,
-          {
-            sender,
-            text: data,
-            parentMessageId: currentMsg?.messageId,
-            messageId: currentMsg?.messageId + '_',
-            submitting: true
-          }
-        ])
+      setMessages([
+        ...messages,
+        currentMsg,
+        {
+          sender,
+          text: data,
+          parentMessageId: currentMsg?.messageId,
+          messageId: currentMsg?.messageId + "_",
+          submitting: true,
+        },
+      ]);
   };
 
   const cancelHandler = (data: any, currentState: any, currentMsg: any) => {
-    const { messages, _currentMsg, message, sender, isRegenerate } = currentState;
+    const { messages, _currentMsg, message, sender, isRegenerate } =
+      currentState;
 
     if (isRegenerate)
-        setMessages([
-          ...messages,
-          {
-            sender,
-            text: data,
-            parentMessageId: message?.overrideParentMessageId,
-            messageId: message?.overrideParentMessageId + '_',
-            cancelled: true
-          }
-        ])
+      setMessages([
+        ...messages,
+        {
+          sender,
+          text: data,
+          parentMessageId: message?.overrideParentMessageId,
+          messageId: message?.overrideParentMessageId + "_",
+          cancelled: true,
+        },
+      ]);
     else
-        setMessages([
-          ...messages,
-          currentMsg,
-          {
-            sender,
-            text: data,
-            parentMessageId: currentMsg?.messageId,
-            messageId: currentMsg?.messageId + '_',
-            cancelled: true
-          }
-        ])
+      setMessages([
+        ...messages,
+        currentMsg,
+        {
+          sender,
+          text: data,
+          parentMessageId: currentMsg?.messageId,
+          messageId: currentMsg?.messageId + "_",
+          cancelled: true,
+        },
+      ]);
   };
 
   const createdHandler = (data: any, currentState: any, currentMsg: any) => {
     const { conversationId } = currentMsg;
-      setConversation({
-        conversationId,
-        latestMessage: null
-      })
+    setConversation({
+      conversationId,
+      latestMessage: null,
+    });
   };
 
   const onCompletion = (data: any, currentState: any, currentMsg: any) => {
     const { requestMessage, responseMessage } = data;
     const { conversationId } = requestMessage;
-    const { messages, _currentMsg, message, isCustomModel, sender, isRegenerate } =
-      currentState;
+    const {
+      messages,
+      _currentMsg,
+      message,
+      isCustomModel,
+      sender,
+      isRegenerate,
+    } = currentState;
     const { model, chatGptLabel, promptPrefix } = message;
     if (isRegenerate) setMessages([...messages, responseMessage]);
     else setMessages([...messages, requestMessage, responseMessage]);
     setSubmitting(false);
 
-    const isBing = model === 'bingai' || model === 'sydney';
+    const isBing = model === "bingai" || model === "sydney";
 
     // refresh title
-    if (requestMessage.parentMessageId == '00000000-0000-0000-0000-000000000000') {
+    if (
+      requestMessage.parentMessageId == "00000000-0000-0000-0000-000000000000"
+    ) {
       setTimeout(() => {
         refreshConversation();
       }, 2000);
@@ -144,36 +158,45 @@ export default function TextChat({ messages }: { messages: any[] }) {
       }, 5000);
     }
 
-    if (!isBing && convo.conversationId === null && convo.parentMessageId === null) {
+    if (
+      !isBing &&
+      convo.conversationId === null &&
+      convo.parentMessageId === null
+    ) {
       const { title } = data;
       const { conversationId, messageId } = responseMessage;
-        setConversation({
-          title,
-          conversationId,
-          parentMessageId: messageId,
-          jailbreakConversationId: null,
-          conversationSignature: null,
-          clientId: null,
-          invocationId: null,
-          chatGptLabel: model === isCustomModel ? chatGptLabel : null,
-          promptPrefix: model === isCustomModel ? promptPrefix : null,
-          latestMessage: null
-        })
-    } else if (model === 'bingai') {
-      console.log('Bing data:', data);
+      setConversation({
+        title,
+        conversationId,
+        parentMessageId: messageId,
+        jailbreakConversationId: null,
+        conversationSignature: null,
+        clientId: null,
+        invocationId: null,
+        chatGptLabel: model === isCustomModel ? chatGptLabel : null,
+        promptPrefix: model === isCustomModel ? promptPrefix : null,
+        latestMessage: null,
+      });
+    } else if (model === "bingai") {
+      console.log("Bing data:", data);
       const { title } = data;
-      const { conversationSignature, clientId, conversationId, invocationId, parentMessageId } =
-        responseMessage;
-        setConversation({
-          title,
-          parentMessageId,
-          conversationSignature,
-          clientId,
-          conversationId,
-          invocationId,
-          latestMessage: null
-        })
-    } else if (model === 'sydney') {
+      const {
+        conversationSignature,
+        clientId,
+        conversationId,
+        invocationId,
+        parentMessageId,
+      } = responseMessage;
+      setConversation({
+        title,
+        parentMessageId,
+        conversationSignature,
+        clientId,
+        conversationId,
+        invocationId,
+        latestMessage: null,
+      });
+    } else if (model === "sydney") {
       const { title } = data;
       const {
         jailbreakConversationId,
@@ -181,28 +204,28 @@ export default function TextChat({ messages }: { messages: any[] }) {
         conversationSignature,
         clientId,
         conversationId,
-        invocationId
+        invocationId,
       } = responseMessage;
-        setConversation({
-          title,
-          jailbreakConversationId,
-          parentMessageId,
-          conversationSignature,
-          clientId,
-          conversationId,
-          invocationId,
-          latestMessage: null
-        })
+      setConversation({
+        title,
+        jailbreakConversationId,
+        parentMessageId,
+        conversationSignature,
+        clientId,
+        conversationId,
+        invocationId,
+        latestMessage: null,
+      });
     }
   };
 
   const errorHandler = (data: any, currentState: any, currentMsg: any) => {
     const { initialResponse, messages, _currentMsg, message } = currentState;
-    console.log('Error:', data);
+    console.log("Error:", data);
     const errorResponse = {
       ...data,
       error: true,
-      parentMessageId: currentMsg?.messageId
+      parentMessageId: currentMsg?.messageId,
     };
     setErrorMessage(data?.text);
     setSubmitting(false);
@@ -226,7 +249,7 @@ export default function TextChat({ messages }: { messages: any[] }) {
     const currentState = submission;
 
     let currentMsg = { ...currentState.message };
-    let latestResponseText = '';
+    let latestResponseText = "";
     // @ts-ignore
     const { server, payload } = createPayload(submission);
     const onMessage = (e: any) => {
@@ -237,10 +260,9 @@ export default function TextChat({ messages }: { messages: any[] }) {
       const data = JSON.parse(e.data);
 
       if (data.final) {
-        
         onCompletion(data, currentState, currentMsg);
         toggleCursor();
-        console.log('final', data);
+        console.log("final", data);
       }
       if (data.created) {
         currentMsg = data.message;
@@ -257,14 +279,14 @@ export default function TextChat({ messages }: { messages: any[] }) {
       }
     };
 
-// @ts-ignore
+    // @ts-ignore
     const events = new SSE(server, {
       payload: JSON.stringify(payload),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     });
 
     events.onopen = function () {
-      console.log('connection is opened');
+      console.log("connection is opened");
     };
 
     events.onmessage = onMessage;
@@ -275,7 +297,7 @@ export default function TextChat({ messages }: { messages: any[] }) {
     };
 
     events.onerror = function (e: any) {
-      console.log('error in opening conn.');
+      console.log("error in opening conn.");
       events.close();
 
       const data = JSON.parse(e.data);
@@ -286,19 +308,20 @@ export default function TextChat({ messages }: { messages: any[] }) {
     events.stream();
 
     return () => {
-      events.removeEventListener('message', onMessage);
+      events.removeEventListener("message", onMessage);
       toggleCursor(true);
       const isCancelled = events.readyState <= 1;
       events.close();
       if (isCancelled) {
-        const e = new Event('cancel');
+        const e = new Event("cancel");
         events.dispatchEvent(e);
       }
     };
   }, [submission]);
 
   const handleRegenerate = () => {
-    if (latestMessage && !latestMessage?.isCreatedByUser) regenerate(latestMessage);
+    if (latestMessage && !latestMessage?.isCreatedByUser)
+      regenerate(latestMessage);
   };
 
   const handleStopGenerating = () => {
@@ -306,15 +329,15 @@ export default function TextChat({ messages }: { messages: any[] }) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (!isComposing.current) submitMessage();
     }
   };
 
   const handleKeyUp = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.shiftKey) {
-      return console.log('Enter + Shift');
+    if (e.key === "Enter" && e.shiftKey) {
+      return console.log("Enter + Shift");
     }
 
     if (isSubmitting) {
@@ -342,18 +365,18 @@ export default function TextChat({ messages }: { messages: any[] }) {
   const isSearchView = messages?.[0]?.searchResult === true;
   const getPlaceholderText = () => {
     if (isSearchView) {
-      return 'Click a message title to open its conversation.'
+      return "Click a message title to open its conversation.";
     }
 
     if (disabled) {
-      return 'Choose another model or customize GPT again';
+      return "Choose another model or customize GPT again";
     }
-  
+
     if (isNotAppendable) {
-      return 'Edit your message or Regenerate.'
+      return "Edit your message or Regenerate.";
     }
-  
-    return '';
+
+    return "";
   };
 
   return (
@@ -370,7 +393,9 @@ export default function TextChat({ messages }: { messages: any[] }) {
                 <StopGeneratingIcon />
                 <span className="hidden md:block">Stop generating</span>
               </button>
-            ) : latestMessage && !latestMessage?.isCreatedByUser && !isSearchView ? (
+            ) : latestMessage &&
+              !latestMessage?.isCreatedByUser &&
+              !isSearchView ? (
               <button
                 onClick={handleRegenerate}
                 className="input-panel-button btn btn-neutral flex justify-center gap-2 border-0 md:border"
@@ -383,12 +408,12 @@ export default function TextChat({ messages }: { messages: any[] }) {
           </span>
           <div
             className={`relative flex flex-grow flex-col rounded-md border border-black/10 ${
-              disabled ? 'bg-gray-100' : 'bg-white'
+              disabled ? "bg-gray-100" : "bg-white"
             } py-2 shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 ${
-              disabled ? 'dark:bg-gray-900' : 'dark:bg-gray-700'
+              disabled ? "dark:bg-gray-900" : "dark:bg-gray-700"
             } dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] md:py-3 md:pl-4`}
           >
-            <ModelMenu />
+            <ModelSelector />
 
             <InputTextarea
               tabIndex={0}
@@ -396,7 +421,7 @@ export default function TextChat({ messages }: { messages: any[] }) {
               ref={inputRef}
               // style={{maxHeight: '200px', height: '24px', overflowY: 'hidden'}}
               rows={1}
-              value={disabled || isNotAppendable ? '' : text}
+              value={disabled || isNotAppendable ? "" : text}
               onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
               onChange={changeHandler}
@@ -404,7 +429,7 @@ export default function TextChat({ messages }: { messages: any[] }) {
               onCompositionEnd={handleCompositionEnd}
               placeholder={getPlaceholderText()}
               disabled={disabled || isNotAppendable}
-              className="m-0 h-auto max-h-52 resize-none overflow-auto border-0 bg-transparent p-0 pl-12 pr-8 leading-6 placeholder:text-sm placeholder:text-gray-600 dark:placeholder:text-gray-500 focus:outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent md:pl-8"
+              className="m-0 h-auto max-h-52 resize-none overflow-auto border-0 bg-transparent p-0 pl-12 pr-8 leading-6 placeholder:text-sm placeholder:text-gray-600 focus:outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:placeholder:text-gray-500 md:pl-8"
             />
             <SubmitButton
               submitMessage={submitMessage}
@@ -413,7 +438,6 @@ export default function TextChat({ messages }: { messages: any[] }) {
           </div>
         </div>
       </form>
-      <Footer />
     </div>
   );
 }

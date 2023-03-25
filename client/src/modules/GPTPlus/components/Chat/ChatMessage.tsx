@@ -6,7 +6,7 @@ import SiblingSwitch from "./SiblingSwitch";
 import {
   useSetConversation,
   useSetLatestMessage,
-  useSetPlatform,
+  useSetModel,
   useSetCustomModel,
   useSetCustomGpt,
   useToggleCursor,
@@ -52,7 +52,7 @@ function ChatMessage({
   const { createCompletion } = useSubmitMesssage();
   const setConversation = useSetConversation();
   const setLatestMessage = useSetLatestMessage();
-  const setModel = useSetPlatform();
+  const setModel = useSetModel();
   const setCustomModel = useSetCustomModel();
   const setCustomGpt = useSetCustomGpt();
   const setCursor = useToggleCursor();
@@ -108,7 +108,7 @@ function ChatMessage({
   const icon = getAvatar({
     sender,
     isCreatedByUser,
-    platform: model,
+    model: model,
     searchResult,
     chatGptLabel,
     promptPrefix,
@@ -235,7 +235,7 @@ function ChatMessage({
               )}
             </div>
             <HoverButtons
-              platform={model}
+              model={model}
               visible={!error && isCreatedByUser && !edit && !searchResult}
               onClick={() => enterEdit()}
             />

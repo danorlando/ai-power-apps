@@ -4,7 +4,7 @@ import {
   CompletionProvider,
   MessageProvider,
   ProfileProvider,
-  PlatformProvider,
+  ModelProvider,
   TextProvider,
 } from "./contexts";
 import Layout from "./layout/Layout";
@@ -12,7 +12,7 @@ import Layout from "./layout/Layout";
 function GPTPlus() {
   return (
     <ProfileProvider>
-      <PlatformProvider>
+      <ModelProvider>
         <ConversationProvider>
           <MessageProvider>
             <CompletionProvider>
@@ -22,7 +22,7 @@ function GPTPlus() {
             </CompletionProvider>
           </MessageProvider>
         </ConversationProvider>
-      </PlatformProvider>
+      </ModelProvider>
     </ProfileProvider>
   );
 }
