@@ -1,10 +1,22 @@
-import { useState, useRef } from "react";
-import { Sidebar as PrimeSidebar } from "primereact/sidebar";
+import { useState, useEffect, useRef, useCallback } from "react";
+import _ from "lodash";
 import styles from "./styles.module.css";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import classNames from "classnames";
-import { useConversationState } from "@modules/GPTPlus/contexts/ConversationContext";
+import {
+  useConversationState,
+  useSetConversations,
+  useSetNewConversation,
+  useRefreshConversation,
+  useSetMessages,
+  useSetDisabled,
+  useSearchState,
+} from "@modules/GPTPlus/contexts";
 import { NewChatButton } from ".";
+import SidebarMenu from "./SidebarMenu";
+import { ConversationList } from "./ConversationList";
+import { searchFetcher, useGetConversationsQuery } from "@data-provider";
+import { Spinner } from '@common/icons'
 
 export type TSidebarProps = {
   visible: boolean;
@@ -13,16 +25,126 @@ export type TSidebarProps = {
 
 function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
   const [isHovering, setIsHovering] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [pages, setPages] = useState(1);
   const [pageNumber, setPage] = useState(1);
   const { conversationId, convos, refreshConvoHint } = useConversationState();
+  const { isSearching, searchQuery} = useSearchState();
+  const setConvos = useSetConversations();
+  const setNewConversation = useSetNewConversation();
+  const setMessages = useSetMessages();
+  const setDisabled = useSetDisabled();
+  const refreshConversation = useRefreshConversation();
+  const getConversationsQuery = useGetConversationsQuery(pageNumber.toString());
 
+  
   const toggleSidebar = () => {
     setSidebarVisible(!visible);
   };
 
+  const onSearchSuccess = (data: any, expectedPage: any) => {
+    const res = data;
+    setConvos({ convos: res.conversations, searchFetch: true });
+    if (expectedPage) {
+      setPage(expectedPage);
+    }
+    setPage(res.pageNumber);
+    setPages(res.pages);
+    setIsFetching(false);
+    if (res.messages?.length > 0) {
+      setMessages(res.messages);
+      setDisabled(true);
+    }
+  };
+
+  const fetch = useCallback(_.partialRight(searchFetcher.bind(null, () => setIsFetching(true)), onSearchSuccess), []);
+
+
+  const clearSearch = () => {
+    setPage(1);
+    refreshConversation();
+    if (!conversationId) {
+     setNewConversation();
+      setMessages([]);
+    }
+    setDisabled(false);
+  };
+
+  const { data, isLoading } = getConversationsQuery;
+
+  useEffect(() => {
+  if (getConversationsQuery.isSuccess) {
+    if (isSearching) {
+      return;
+    }
+    if (getConversationsQuery.data) {
+      // @ts-ignore
+      const { conversations, pages } = data;
+      if (pageNumber > pages) {
+        setPage(pages);
+      } else {
+        setConvos({ convos: conversations, searchFetch: false});
+        setPages(pages);
+      }
+    }
+   
+  }
+}, [data, isSearching, pageNumber]);
+
   const containerRef = useRef(null);
   const scrollPositionRef = useRef(null);
+
+  const moveToTop = () => {
+    const container = containerRef.current;
+    if (container) {
+      scrollPositionRef.current = container.scrollTop;
+    }
+  };
+
+  const nextPage = async () => {
+    moveToTop();
+
+    // if (!isSearching) {
+    //   setPage((prev) => prev + 1);
+    //   await mutate();
+    // } else {
+    //   await fetch(searchQuery, +pageNumber + 1);
+    // }
+  };
+
+  const previousPage = async () => {
+    moveToTop();
+
+    // if (!isSearching) {
+    //   setPage((prev) => prev - 1);
+    //   await mutate();
+    // } else {
+    //   await fetch(searchQuery, +pageNumber - 1);
+    // }
+  };
+
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (container && scrollPositionRef.current !== null) {
+      const { scrollHeight, clientHeight } = container;
+      const maxScrollTop = scrollHeight - clientHeight;
+
+      container.scrollTop = Math.min(maxScrollTop, scrollPositionRef.current);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    setSidebarVisible(false);
+  }, [conversationId]);
+
+  const toggleNavVisible = () => {
+    setSidebarVisible((prev) => {
+      return !prev;
+    });
+  };
+
 
   const containerClasses =
     pageNumber === 1
@@ -37,7 +159,7 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
           (visible ? " active" : "")
         }
       > */}
-        <aside className={classNames(styles.sidebar, visible && styles.active)}>
+      <aside className={classNames(styles.sidebar, visible && styles.active)}>
         <div className="flex h-full min-h-0 flex-col ">
           <div className="scrollbar-trigger flex h-full w-full flex-1 items-start border-white/20">
             <nav className="flex h-full flex-1 flex-col space-y-1 p-2">
@@ -51,11 +173,10 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
                 ref={containerRef}
               >
                 <div className={containerClasses}>
-                  TEST
-                  {/* {isLoading && pageNumber === 1 ? (
+                  {isLoading && pageNumber === 1 ? (
                     <Spinner />
                   ) : (
-                    <Conversations
+                    <ConversationList
                       conversations={convos}
                       conversationId={conversationId}
                       nextPage={nextPage}
@@ -64,10 +185,11 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
                       pageNumber={pageNumber}
                       pages={pages}
                     />
-                  )} */}
+                  )}
                 </div>
               </div>
-              {/* <NavLinks /> */}
+              <SidebarMenu fetch={fetch} onSearchSuccess={onSearchSuccess}
+                clearSearch={clearSearch} />
             </nav>
           </div>
         </div>

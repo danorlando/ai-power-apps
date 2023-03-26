@@ -69,10 +69,20 @@ export const useGetCustomGptsQuery = (): QueryObserverResult<
   t.TCustomPrompt[],
   unknown
 > => {
-  return useQuery([QueryKeys.getCustomGpts], () => dataService.getCustomGpts());
+  return useQuery([QueryKeys.getCustomGpts], () => dataService.getCustomGpts(), {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+  });
 };
 
-export const useDeleteCustomGptMutation = (): UseMutationResult<t.TDeleteCustomGptResponse, unknown, t.TDeleteCustomGptRequest, unknown> => {
+export const useDeleteCustomGptMutation = (): UseMutationResult<
+  t.TDeleteCustomGptResponse,
+  unknown,
+  t.TDeleteCustomGptRequest,
+  unknown
+> => {
   const queryClient = useQueryClient();
   return useMutation(
     (payload: t.TDeleteCustomGptRequest) =>
@@ -83,8 +93,31 @@ export const useDeleteCustomGptMutation = (): UseMutationResult<t.TDeleteCustomG
       },
     }
   );
-}
+};
 
-export const useGetModelsQuery = (): QueryObserverResult<t.TGetModelsResponse, unknown> => {
+export const useGetModelsQuery = (): QueryObserverResult<
+  t.TGetModelsResponse,
+  unknown
+> => {
   return useQuery([QueryKeys.getModels], () => dataService.getModels());
+};
+
+export const useClearConversationsMutation = (): UseMutationResult<unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation(() => dataService.clearAllConversations(), {
+    onSuccess: () => {
+      queryClient.invalidateQueries([QueryKeys.getConversations]);
+    },
+  });
+};
+
+export const useGetConversationsQuery = (pageNumber: string): QueryObserverResult<t.TGetConversationsResponse> => {
+  return useQuery([QueryKeys.getConversations, pageNumber], () =>
+    dataService.getConversations(pageNumber), {
+      retry: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+    }
+  );
 }

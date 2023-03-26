@@ -1,5 +1,5 @@
 import { useCompletionState, useConversationState } from "@modules/GPTPlus/contexts";
-
+import styles from "./styles.module.css";
 type TSubmitButtonProps = {
   submitMessage: () => void;
   disabled: boolean | undefined;
@@ -32,9 +32,10 @@ export default function SubmitButton({ submitMessage, disabled }: TSubmitButtonP
     <button
       onClick={clickHandler}
       disabled={disabled}
-      className="group absolute bottom-0 right-0 flex h-[100%] w-[50px] items-center justify-center bg-transparent p-1 text-gray-500"
+      className={styles.submitButton}
     >
-      <div className="m-1 mr-0 rounded-md p-2 pt-[10px] pb-[10px] group-hover:bg-gray-100 group-disabled:hover:bg-transparent dark:group-hover:bg-gray-900 dark:group-hover:text-gray-400 dark:group-disabled:hover:bg-transparent">
+      <div className={disabled ? styles.submitButtonInnerDisabled : styles.submitButtonInner}>
+      {/* <div className="m-1 mr-0 rounded-md p-2 pt-[10px] pb-[10px] group-hover:bg-gray-100 group-disabled:hover:bg-transparent dark:group-hover:bg-gray-900 dark:group-hover:text-gray-400 dark:group-disabled:hover:bg-transparent"> */}
         <svg
           stroke="currentColor"
           fill="none"

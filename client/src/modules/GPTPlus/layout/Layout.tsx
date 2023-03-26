@@ -1,22 +1,27 @@
 import { useState, useEffect } from "react";
 import { Sidebar, MobileNav } from "./Nav";
-import { useConversationState, useProfileState, useMessageState } from "../contexts";
+import {
+  useConversationState,
+  useProfileState,
+  useMessageState,
+} from "../contexts";
 import styles from "./styles.module.css";
-import ChatContainer from '@modules/GPTPlus/components/Chat/ChatContainer';
-import PromptInput from "@modules/GPTPlus/components/Chat/PromptInput";
+import ChatContainer from "@modules/GPTPlus/components/Chat/ChatContainer";
+import PromptInput from "@modules/GPTPlus/components/Chat/PromptInput/PromptInput";
+import Footer from "./Footer";
 
 function Layout() {
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const { user } = useProfileState();
   const { title } = useConversationState();
   // todo: add call to get user from user service
-  
+
   useEffect(() => {
     document.title = title;
   }, [title]);
 
   const { messages, messageTree } = useMessageState();
-  
+
   return (
     <div className="flex h-screen">
       <Sidebar visible={sidebarVisible} setSidebarVisible={setSidebarVisible} />
@@ -26,9 +31,10 @@ function Layout() {
             visible={sidebarVisible}
             setSidebarVisible={setSidebarVisible}
           />
-          <ChatContainer messages={messages} messageTree={messageTree}/>
-          <PromptInput messages={messages}/>
+          <ChatContainer messages={messages} messageTree={messageTree} />
+          <PromptInput messages={messages} />
         </div>
+        <Footer />
       </section>
     </div>
   );

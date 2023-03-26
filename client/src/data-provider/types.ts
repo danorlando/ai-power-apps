@@ -144,6 +144,12 @@ export type TUpdateCustomGptResponse = {};
 
 export type TDeleteCustomGptRequest = {
   id: string;
-}
+};
 
 export type TDeleteCustomGptResponse = {};
+
+export type TClearConversationsRequest = {};
+
+export type TClearConversationsResponse = {};
+
+export type TGetCustomGptsResponse = {};

@@ -33,3 +33,18 @@
   .chatContainer {
     padding-top: 0;  }
 }
+
+.footer {
+  color: hsla(0,0%,100%,.5);
+  font-size: .75rem;
+  line-height: 1rem;
+  text-align: center;
+  padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+  background-color: #343541;
+}
+
+@media (min-width: 768px) {
+  .footer {
+    padding: 0.75rem 1rem 1.5rem 1rem;
+  }
+}

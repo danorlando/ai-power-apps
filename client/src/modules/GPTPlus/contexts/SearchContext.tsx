@@ -3,11 +3,15 @@ import React, { useReducer } from "react";
 export type TSearchState = {
   isSearching: boolean;
   searchQuery: string;
+  isSearchEnabled: boolean;
+  inputValue: string;
 };
 
 const initialState = {
   isSearching: false,
   searchQuery: "",
+  isSearchEnabled: false,
+  inputValue: "",
 };
 
 const SearchContext = React.createContext<TSearchState | undefined>(undefined);
@@ -15,6 +19,8 @@ const SearchContext = React.createContext<TSearchState | undefined>(undefined);
 export enum SearchActions {
   setIsSearching = "setIsSearching",
   setSearchQuery = "setSearchQuery",
+  setSearchState = "setSearchState",
+  setInputValue = "setInputValue",
 }
 
 export type TSearchAction = {
@@ -32,6 +38,16 @@ const setSearchQueryAction = (payload: string) => ({
   payload,
 });
 
+const setSearchStateAction = (payload: boolean) => ({
+  type: SearchActions.setSearchState,
+  payload,
+});
+
+const setInputValueAction = (payload: string) => ({
+  type: SearchActions.setInputValue,
+  payload,
+});
+
 const reducer = (state: TSearchState, { type, payload }: TSearchAction) => {
   switch (type) {
     case SearchActions.setIsSearching:
@@ -45,9 +61,19 @@ const reducer = (state: TSearchState, { type, payload }: TSearchAction) => {
       } else if (payload?.length > 0 && !state.isSearching) {
         state.isSearching = true;
       } 
-    return {
+      return {
         ...state,
         searchQuery: payload,
+      };
+    case SearchActions.setSearchState:
+      return {
+        ...state,
+        isSearchEnabled: payload,
+      };
+    case SearchActions.setInputValue:
+      return {
+        ...state,
+        inputValue: payload,
       };
     default:
       return state;
@@ -98,6 +124,28 @@ export const useSetSearchQuery = () => {
   }
   return React.useCallback(
     (payload: string) => dispatch(setSearchQueryAction(payload)),
+    [dispatch]
+  );
+}
+
+export const useSetSearchState = () => {
+  const dispatch = React.useContext(SearchDispatchContext);
+  if (dispatch === undefined) {
+    throw new Error('"useSetSearchState" must be used inside SearchProvider');
+  }
+  return React.useCallback(
+    (payload: boolean) => dispatch(setSearchStateAction(payload)),
+    [dispatch]
+  );
+}
+
+export const useSetInputValue = () => {
+  const dispatch = React.useContext(SearchDispatchContext);
+  if (dispatch === undefined) {
+    throw new Error('"useSetInputValue" must be used inside SearchProvider');
+  }
+  return React.useCallback(
+    (payload: string) => dispatch(setInputValueAction(payload)),
     [dispatch]
   );
 }

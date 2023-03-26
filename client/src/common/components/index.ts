@@ -6,9 +6,10 @@ export function cn(...inputs: any) {
 }
 
 export * from './Button';
-export * from './Dialog';
+export * from './DialogPrimitive';
 export * from './Input';
 export * from './Label';
 export * from './Tabs';
 export * from './Textarea';
 export * from './DropdownMenu';
+export {default as DialogModal} from './DialogModal'

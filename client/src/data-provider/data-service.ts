@@ -21,6 +21,10 @@ export function deleteConversation(payload: t.TDeleteConversationRequest) {
   return request.post(endpoints.deleteConversation(), payload);
 }
 
+export function clearAllConversations() {
+  return request.post(endpoints.deleteConversation());
+}
+
 export function getMessages(id: string): Promise<t.TMessage[]> {
   return request.get(endpoints.getMessages(id));
 }
@@ -52,3 +56,18 @@ export function deleteCustomGpt(payload: t.TDeleteCustomGptRequest): Promise<t.T
 export function getModels(): Promise<t.TCustomPrompt[]> {
   return request.get(endpoints.getModels());
 }
+
+type TSearchFetcherProps = {
+  pre: () => void;
+  q: string;
+  pageNumber: string;
+  callback: (data: any) => void;
+}
+
+export const searchFetcher = async ({pre, q, pageNumber, callback}: TSearchFetcherProps) => {
+  pre();
+  //@ts-ignore
+  const { data } = await request.get(endpoints.search(q, pageNumber));
+  console.log('search data', data);
+  callback(data);
+};

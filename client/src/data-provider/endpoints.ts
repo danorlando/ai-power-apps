@@ -52,3 +52,7 @@ export const deleteCustomGpt = () => {
 export const generateTitle = () => {
   return `${LOCAL_API_BASEURL}/api/convos/gen_title`;
 };
+
+export const search = (q: string, pageNumber: string) => {
+  return `${LOCAL_API_BASEURL}/api/search?q=${q}&pageNumber=${pageNumber}`;
+}

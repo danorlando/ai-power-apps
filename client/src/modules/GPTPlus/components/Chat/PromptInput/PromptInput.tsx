@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 // @ts-ignore
-import { SSE } from "../../utils/sse.js";
-import SubmitButton from "../common/SubmitButton";
+import { SSE } from "../../../utils/sse.js";
+import SubmitButton from "./SubmitButton";
 // import RegenerateButton from './RegenerateButton';
-import ModelSelector from './ModelMenu';
+import ModelMenu from "../ModelMenu";
 import { InputTextarea } from "primereact/inputtextarea";
 import createPayload from "@modules/GPTPlus/utils";
 // import resetConvo from '~/utils/resetConvo';
 import { RegenerateIcon, StopGeneratingIcon } from "@common/icons";
+import classNames from "classnames";
 import {
   useSetConversation,
   useSetError,
@@ -23,6 +24,7 @@ import {
   useTextState,
 } from "@modules/GPTPlus/contexts";
 import { useSubmitMesssage } from "@modules/GPTPlus/hooks";
+import styles from "./styles.module.css";
 
 export default function PromptInput({ messages }: { messages: any[] }) {
   const [errorMessage, setErrorMessage] = useState("");
@@ -380,10 +382,10 @@ export default function PromptInput({ messages }: { messages: any[] }) {
   };
 
   return (
-    <div className="input-panel md:bg-vert-light-gradient dark:md:bg-vert-dark-gradient fixed bottom-0 left-0 w-full border-t bg-white py-2 dark:border-white/20 dark:bg-gray-800 md:absolute md:border-t-0 md:border-transparent md:bg-transparent md:dark:border-transparent md:dark:bg-transparent">
-      <form className="stretch mx-2 flex flex-row gap-3 last:mb-2 md:pt-2 md:last:mb-6 lg:mx-auto lg:max-w-3xl lg:pt-6">
-        <div className="relative flex h-full flex-1 md:flex-col">
-          <span className="order-last ml-1 flex justify-center gap-0 md:order-none md:m-auto md:mb-2 md:w-full md:gap-2">
+    <div className={styles.mainPromptContainer}>
+      <form className={styles.promptForm}>
+        <div className={styles.promptWrapper}>
+          <span className={styles.regenerateContainer}>
             {isSubmitting && !isSearchView ? (
               <button
                 onClick={handleStopGenerating}
@@ -407,19 +409,17 @@ export default function PromptInput({ messages }: { messages: any[] }) {
             ) : null}
           </span>
           <div
-            className={`relative flex flex-grow flex-col rounded-md border border-black/10 ${
-              disabled ? "bg-gray-100" : "bg-white"
-            } py-2 shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 ${
-              disabled ? "dark:bg-gray-900" : "dark:bg-gray-700"
-            } dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] md:py-3 md:pl-4`}
+            className={
+              disabled ? styles.textareaWrapperDisabled : styles.textareaWrapper
+            }
           >
-            <ModelSelector />
+            <ModelMenu />
 
             <InputTextarea
               tabIndex={0}
               autoFocus
               ref={inputRef}
-              // style={{maxHeight: '200px', height: '24px', overflowY: 'hidden'}}
+              autoResize
               rows={1}
               value={disabled || isNotAppendable ? "" : text}
               onKeyUp={handleKeyUp}
@@ -429,7 +429,8 @@ export default function PromptInput({ messages }: { messages: any[] }) {
               onCompositionEnd={handleCompositionEnd}
               placeholder={getPlaceholderText()}
               disabled={disabled || isNotAppendable}
-              className="m-0 h-auto max-h-52 resize-none overflow-auto border-0 bg-transparent p-0 pl-12 pr-8 leading-6 placeholder:text-sm placeholder:text-gray-600 focus:outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:placeholder:text-gray-500 md:pl-8"
+              className={styles.inputTextarea}
+              // className="m-0 h-auto max-h-52 resize-none overflow-auto border-0 bg-transparent p-0 pl-12 pr-8 leading-6 placeholder:text-sm placeholder:text-gray-600 focus:outline-none focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:placeholder:text-gray-500 md:pl-8"
             />
             <SubmitButton
               submitMessage={submitMessage}

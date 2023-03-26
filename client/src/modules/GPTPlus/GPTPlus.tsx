@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   ConversationProvider,
   CompletionProvider,
@@ -6,6 +5,8 @@ import {
   ProfileProvider,
   ModelProvider,
   TextProvider,
+  ThemeProvider,
+  SearchProvider
 } from "./contexts";
 import Layout from "./layout/Layout";
 
@@ -13,15 +14,19 @@ function GPTPlus() {
   return (
     <ProfileProvider>
       <ModelProvider>
+        <SearchProvider>
         <ConversationProvider>
           <MessageProvider>
             <CompletionProvider>
               <TextProvider>
-                <Layout />
+                <ThemeProvider>
+                  <Layout />
+                </ThemeProvider>
               </TextProvider>
             </CompletionProvider>
           </MessageProvider>
         </ConversationProvider>
+        </SearchProvider>
       </ModelProvider>
     </ProfileProvider>
   );

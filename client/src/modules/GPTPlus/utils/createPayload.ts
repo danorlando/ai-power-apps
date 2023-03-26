@@ -20,6 +20,10 @@ export default function createPayload({ convo, message }: TcreatePayloadProps) {
     }
 
   const isBing = model === 'bingai' || model === 'sydney';
+  if (isBing && !convo?.conversationId) {
+    payload.toneStyle = convo.toneStyle || 'fast';
+  }
+  
   if (isBing && convo?.conversationId) {
     payload = {
       ...payload,

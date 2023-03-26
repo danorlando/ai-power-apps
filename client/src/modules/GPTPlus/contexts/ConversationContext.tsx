@@ -18,6 +18,7 @@ type TConversationState = {
   refreshConvoHint: number;
   latestMessage: TMessage | null;
   convos: TConversation[];
+  toneStyle: string | null;
 };
 
 const initialState = {
@@ -37,6 +38,7 @@ const initialState = {
   refreshConvoHint: 0,
   latestMessage: null,
   convos: [],
+  toneStyle: null,
 };
 
 const ConversationContext = React.createContext<TConversationState | undefined>(
@@ -139,12 +141,17 @@ const reducer = (
         pages: payload || 1,
       };
     case ConversationActions.setConversations:
-      return {
-        ...state,
-        convos: payload?.sort(
+      const { convos, searchFetch } = payload;
+      if (searchFetch) {
+        state.convos = convos;
+      } else {
+        state.convos = convos.sort(
           // @ts-ignore
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        ),
+        );
+      }
+      return {
+        ...state,
       };
     case ConversationActions.setNewConversation:
       return {
@@ -157,6 +164,7 @@ const reducer = (
         conversationSignature: null,
         clientId: null,
         invocationId: null,
+        toneStyle: null,
         chatGptLabel: null,
         promptPrefix: null,
         convosLoading: false,
