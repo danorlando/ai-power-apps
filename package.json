@@ -1,5 +1,15 @@
 {
   "dependencies": {
     "sanitize-html": "^2.10.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.32.1",
+    "cross-env": "^7.0.3"
+  },
+  "scripts": {
+    "e2e": "playwright test --config=e2e/playwright.config.ts",
+    "e2e:update": "playwright test --config=e2e/playwright.config.js --update-snapshots",
+    "e2e:debug": "cross-env PWDEBUG=1 playwright test --config=e2e/playwright.config.ts",
+    "e2e:report": "npx playwright show-report e2e/playwright-report"
   }
 }

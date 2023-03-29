@@ -71,3 +71,7 @@ archive
 dist-ssr
 .npmrc
 .DS_Store
+/e2e/specs/.test-results/
+/e2e/playwright-report/
+/playwright/.cache/
+
