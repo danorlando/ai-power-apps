@@ -14,7 +14,7 @@ export default function Regenerate({ submitMessage, tryAgain, errorMessage }: TR
 
   return (
     <>
-      <span className="mb-2 block justify-center text-xs text-black dark:text-white/50 md:mb-2">
+      <span className="mb-2 block flex justify-center text-xs text-black dark:text-white/50 md:mb-2">
         There was an error generating a response
       </span>
       <span className="m-auto flex justify-center">

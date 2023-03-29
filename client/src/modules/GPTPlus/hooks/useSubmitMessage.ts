@@ -12,13 +12,16 @@ import {
   useSetSubmission,
   useModelState,
   useCompletionState,
-  useTextState,
 } from "@modules/GPTPlus/contexts";
 import { v4 } from "uuid";
 import { TMessage, TConversation } from "@data-provider";
 
-export type TCreateCompletionProps = {
-  shouldRegenerate: boolean;
+
+type TcreateCompletionProps = {
+  text: string;
+  parentMessageId?: string;
+  conversationId?: string;
+  messageId?: string;
 };
 
 export const useSubmitMesssage = () => {
@@ -27,7 +30,6 @@ export const useSubmitMesssage = () => {
   const { messages } = useMessageState();
   const { model, chatGptLabel, promptPrefix, isSubmitting } =
     useCompletionState();
-  const { text } = useTextState();
   const { latestMessage, error } = conversation;
 
   const setError = useSetError();
@@ -37,12 +39,6 @@ export const useSubmitMesssage = () => {
   const setSubmitting = useSetSubmitting();
   const setSubmission = useSetSubmission();
 
-  type TcreateCompletionProps = {
-    text: string;
-    parentMessageId?: string;
-    conversationId?: string;
-    messageId?: string;
-  };
   const createCompletion = (
     {
       text,
@@ -50,17 +46,18 @@ export const useSubmitMesssage = () => {
       conversationId,
       messageId,
     }: TcreateCompletionProps,
-    { shouldRegenerate = false }: { shouldRegenerate?: boolean } = {}
+    { isRegenerate = false }: { isRegenerate?: boolean } = {}
   ) => {
+
     if (error) {
       setError(false);
     }
 
-    if (!isSubmitting || text === "") {
+    if (!!isSubmitting || text === "") {
       return;
     }
-
     text = text.trim();
+    // this is not a real messageId, it is used as placeholder before real messageId returned
     const initialMessageId = v4();
     // @ts-ignore
     const isCustomModel = model === "chatgptCustom" || !initial[model];
@@ -69,13 +66,14 @@ export const useSubmitMesssage = () => {
       parentMessageId ||
       latestMessage?.messageId ||
       "00000000-0000-0000-0000-000000000000";
+    let currentMessages = messages;
 
     if (resetConversation({ messages, sender })) {
       parentMessageId = "00000000-0000-0000-0000-000000000000";
       // @ts-ignore
       conversationId = null;
       setNewConversation();
-      setMessages([]);
+      currentMessages = [];
     }
     const currentMsg = {
       sender: "User",
@@ -89,8 +87,8 @@ export const useSubmitMesssage = () => {
     const initialResponse = {
       sender,
       text: "",
-      parentMessageId: shouldRegenerate ? messageId : initialMessageId,
-      messageId: (shouldRegenerate ? messageId : initialMessageId) + "_",
+      parentMessageId: isRegenerate ? messageId : initialMessageId,
+      messageId: (isRegenerate ? messageId : initialMessageId) + "_",
       submitting: true,
     };
 
@@ -102,22 +100,21 @@ export const useSubmitMesssage = () => {
         model,
         chatGptLabel,
         promptPrefix,
-        overrideParentMessageId: shouldRegenerate ? messageId : null,
+        overrideParentMessageId: isRegenerate ? messageId : null,
       },
       messages: messages,
-      shouldRegenerate,
+      isRegenerate,
       initialResponse,
       sender,
     };
 
     console.log("User Input:", text);
 
-    if (shouldRegenerate) {
+    if (isRegenerate) {
       // @ts-ignore TODO: fix type issue
-      setMessages([...messages, initialResponse]);
+      setMessages([...currentMessages, initialResponse]);
     } else {
-      // @ts-ignore TODO: fix type issue
-      setMessages([...messages, currentMsg, initialResponse]);
+      setMessages([...currentMessages, currentMsg, initialResponse]);
       setText("");
     }
     setSubmitting(true);
@@ -132,7 +129,7 @@ export const useSubmitMesssage = () => {
     );
 
     if (parentMessage && parentMessage.isCreatedByUser)
-      createCompletion({ ...parentMessage }, { shouldRegenerate: true });
+      createCompletion({ ...parentMessage }, { isRegenerate: true });
     else
       console.error(
         "Failed to regenerate the message: parentMessage not found or not created by user.",
@@ -158,78 +155,78 @@ type TSubmitMessageProps = {
   promptPrefix: string;
 };
 
-export default function submitMessage({
-  model,
-  text,
-  conversation,
-  messageRecievedHandler,
-  conversationChangeHandler,
-  errorHandler,
-  chatGptLabel,
-  promptPrefix,
-}: TSubmitMessageProps) {
-  const endpoint = `/api/ask`;
-  let payload = { model, text, chatGptLabel, promptPrefix };
-  if (conversation.conversationId && conversation.parentMessageId) {
-    payload = {
-      ...payload,
-      // @ts-ignore
-      conversationId: conversation.conversationId,
-      parentMessageId: conversation.parentMessageId,
-    };
-  }
+// export default function submitMessage({
+//   model,
+//   text,
+//   conversation,
+//   messageRecievedHandler,
+//   conversationChangeHandler,
+//   errorHandler,
+//   chatGptLabel,
+//   promptPrefix,
+// }: TSubmitMessageProps) {
+//   const endpoint = `/api/ask`;
+//   let payload = { model, text, chatGptLabel, promptPrefix };
+//   if (conversation.conversationId && conversation.parentMessageId) {
+//     payload = {
+//       ...payload,
+//       // @ts-ignore
+//       conversationId: conversation.conversationId,
+//       parentMessageId: conversation.parentMessageId,
+//     };
+//   }
 
-  const isBing = model === "bingai" || model === "sydney";
-  if (isBing && conversation.conversationId) {
-    payload = {
-      ...payload,
-      // @ts-ignore
-      jailbreakConversationId: conversation.jailbreakConversationId,
-      conversationId: conversation.conversationId,
-      conversationSignature: conversation.conversationSignature,
-      clientId: conversation.clientId,
-      invocationId: conversation.invocationId,
-    };
-  }
+//   const isBing = model === "bingai" || model === "sydney";
+//   if (isBing && conversation.conversationId) {
+//     payload = {
+//       ...payload,
+//       // @ts-ignore
+//       jailbreakConversationId: conversation.jailbreakConversationId,
+//       conversationId: conversation.conversationId,
+//       conversationSignature: conversation.conversationSignature,
+//       clientId: conversation.clientId,
+//       invocationId: conversation.invocationId,
+//     };
+//   }
 
-  let server = endpoint;
-  server = model === "bingai" ? server + "/bing" : server;
-  server = model === "sydney" ? server + "/sydney" : server;
+//   let server = endpoint;
+//   server = model === "bingai" ? server + "/bing" : server;
+//   server = model === "sydney" ? server + "/sydney" : server;
 
-  const events = new SSE(server, {
-    payload: JSON.stringify(payload),
-    headers: { "Content-Type": "application/json" },
-  });
+//   const events = new SSE(server, {
+//     payload: JSON.stringify(payload),
+//     headers: { "Content-Type": "application/json" },
+//   });
 
-  events.onopen = function () {
-    console.log("connection is opened");
-  };
+//   events.onopen = function () {
+//     console.log("connection is opened");
+//   };
 
-  events.onmessage = function (e: any) {
-    const data = JSON.parse(e.data);
-    let text = data.text || data.response;
-    if (data.message) {
-      messageRecievedHandler(text, events);
-    }
+//   events.onmessage = function (e: any) {
+//     const data = JSON.parse(e.data);
+//     let text = data.text || data.response;
+//     if (data.message) {
+//       messageRecievedHandler(text, events);
+//     }
 
-    if (data.final) {
-      conversationChangeHandler(data);
-      console.log("final", data);
-    } else {
-      // console.log('dataStream', data);
-    }
-  };
+//     if (data.final) {
+//       conversationChangeHandler(data);
+//       console.log("final", data);
+//     } else {
+//       // console.log('dataStream', data);
+//     }
+//   };
 
-  events.onerror = function (e: any) {
-    console.log("error opening connection.");
-    events.close();
-    errorHandler(e);
-  };
+//   events.onerror = function (e: any) {
+//     console.log("error opening connection.");
+//     events.close();
+//     errorHandler(e);
+//   };
 
-  events.addEventListener("stop", () => {
-    console.log("stop event received");
-    events.close();
-  });
+//   events.addEventListener("stop", () => {
+//     console.log("stop event received");
+//     events.close();
+//   });
 
-  events.stream();
-}
+//   events.stream();
+// }
