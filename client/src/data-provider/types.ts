@@ -1,5 +1,5 @@
 export type TMessage = {
-  messageId?: string;
+  messageId: string;
   conversationId: string;
   conversationSignature: string | null;
   clientId: string;
@@ -35,6 +35,7 @@ export type TConversation = {
   messages: TMessage[];
   createdAt: string;
   updatedAt: string;
+  toneStyle: string;
 };
 
 export type TPrompt = {

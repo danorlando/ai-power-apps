@@ -16,7 +16,8 @@ import { NewChatButton } from ".";
 import SidebarMenu from "./SidebarMenu";
 import { ConversationList } from "./ConversationList";
 import { searchFetcher, useGetConversationsQuery } from "@data-provider";
-import { Spinner } from '@common/icons'
+import { Spinner } from "@common/icons";
+import { Pagination } from "./ConversationList";
 
 export type TSidebarProps = {
   visible: boolean;
@@ -29,7 +30,7 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
   const [pages, setPages] = useState(1);
   const [pageNumber, setPage] = useState(1);
   const { conversationId, convos, refreshConvoHint } = useConversationState();
-  const { isSearching, searchQuery} = useSearchState();
+  const { isSearching, searchQuery } = useSearchState();
   const setConvos = useSetConversations();
   const setNewConversation = useSetNewConversation();
   const setMessages = useSetMessages();
@@ -37,7 +38,6 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
   const refreshConversation = useRefreshConversation();
   const getConversationsQuery = useGetConversationsQuery(pageNumber.toString());
 
-  
   const toggleSidebar = () => {
     setSidebarVisible(!visible);
   };
@@ -57,14 +57,19 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
     }
   };
 
-  const fetch = useCallback(_.partialRight(searchFetcher.bind(null, () => setIsFetching(true)), onSearchSuccess), []);
-
+  const fetch = useCallback(
+    _.partialRight(
+      searchFetcher.bind(null, () => setIsFetching(true)),
+      onSearchSuccess
+    ),
+    []
+  );
 
   const clearSearch = () => {
     setPage(1);
     refreshConversation();
     if (!conversationId) {
-     setNewConversation();
+      setNewConversation();
       setMessages([]);
     }
     setDisabled(false);
@@ -73,23 +78,22 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
   const { data, isLoading } = getConversationsQuery;
 
   useEffect(() => {
-  if (getConversationsQuery.isSuccess) {
-    if (isSearching) {
-      return;
-    }
-    if (getConversationsQuery.data) {
-      // @ts-ignore
-      const { conversations, pages } = data;
-      if (pageNumber > pages) {
-        setPage(pages);
-      } else {
-        setConvos({ convos: conversations, searchFetch: false});
-        setPages(pages);
+    if (getConversationsQuery.isSuccess) {
+      if (isSearching) {
+        return;
+      }
+      if (getConversationsQuery.data) {
+        // @ts-ignore
+        const { conversations, pages } = data;
+        if (pageNumber > pages) {
+          setPage(pages);
+        } else {
+          setConvos({ convos: conversations, searchFetch: false });
+          setPages(pages);
+        }
       }
     }
-   
-  }
-}, [data, isSearching, pageNumber]);
+  }, [data, isSearching, pageNumber]);
 
   const containerRef = useRef(null);
   const scrollPositionRef = useRef(null);
@@ -123,7 +127,6 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
     // }
   };
 
-
   useEffect(() => {
     const container = containerRef.current;
 
@@ -139,16 +142,9 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
     setSidebarVisible(false);
   }, [conversationId]);
 
-  const toggleNavVisible = () => {
-    setSidebarVisible((prev) => {
-      return !prev;
-    });
-  };
-
-
   const containerClasses =
     pageNumber === 1
-      ? "flex flex-col gap-2 text-gray-100 text-sm h-full justify-center items-center"
+      ? "flex flex-col gap-2 text-gray-100 text-sm h-full mt-2"
       : "flex flex-col gap-2 text-gray-100 text-sm";
 
   return (
@@ -173,23 +169,28 @@ function Sidebar({ visible, setSidebarVisible }: TSidebarProps) {
                 ref={containerRef}
               >
                 <div className={containerClasses}>
-                  {isLoading && pageNumber === 1 ? (
+                  {(isLoading && pageNumber === 1) || isFetching ? (
                     <Spinner />
                   ) : (
                     <ConversationList
                       conversations={convos}
                       conversationId={conversationId}
-                      nextPage={nextPage}
-                      previousPage={previousPage}
                       moveToTop={moveToTop}
-                      pageNumber={pageNumber}
-                      pages={pages}
                     />
                   )}
+                  <Pagination
+                    pages={pages}
+                    pageNumber={pageNumber}
+                    nextPage={nextPage}
+                    previousPage={previousPage}
+                  />
                 </div>
               </div>
-              <SidebarMenu fetch={fetch} onSearchSuccess={onSearchSuccess}
-                clearSearch={clearSearch} />
+              <SidebarMenu
+                fetch={fetch}
+                onSearchSuccess={onSearchSuccess}
+                clearSearch={clearSearch}
+              />
             </nav>
           </div>
         </div>

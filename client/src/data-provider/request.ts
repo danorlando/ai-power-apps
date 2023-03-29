@@ -1,7 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 async function _get<T>(url: string, options?: AxiosRequestConfig): Promise<T> {
-  console.log(axios.defaults.headers.common);
   const response = await axios.get(url, options);
   return response.data;
 }

@@ -24,6 +24,7 @@ export default function ConversationList({
                 parentMessageId: convo.parentMessageId || null,
                 clientId: convo.clientId,
                 invocationId: convo.invocationId,
+                toneStyle: convo.toneStyle,
               }
             : null;
 

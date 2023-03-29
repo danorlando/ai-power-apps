@@ -119,13 +119,6 @@ export default function Conversation({
       setCustomModel(null);
     }
 
-    // if (modelMap[chatGptLabel.toLowerCase()]) {
-    //   console.log('custom model', chatGptLabel);
-    //   dispatch(setCustomModel(chatGptLabel.toLowerCase()));
-    // } else {
-    //   dispatch(setCustomModel(null));
-    // }
-
     //@ts-ignore
     setMessages(messagesQuery.data);
     setCustomGpt(conversation);

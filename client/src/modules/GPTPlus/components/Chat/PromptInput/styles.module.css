@@ -56,7 +56,6 @@
   .regenerateContainer {
     width: 100%;
     margin-bottom: 0.5rem;
-    margin: auto;
     order: 0;
     gap: 0.5rem;
   }
@@ -82,7 +81,6 @@
   bottom: 0;
   left: 0;
   border-top-width: 1px;
-  margin:auto;
   border-color: hsla(0,0%,100%,.2);
 }
 
@@ -126,12 +124,6 @@
   .promptForm {
     margin: auto;
     max-width: 48rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .promptForm {
-    margin: 0 1rem 0 1rem;
   }
 }
 
